@@ -1,7 +1,0 @@
-NPC 1 1 true Hello traveler!
-NPC 4 3 true Hello!
-NPC 10 5 true I'm guarding this key!
-NPC 17 29 true This key is precious!
-NPC 29 39 true You found me and the key!
-NPC 40 26 true Take the key if you dare!
-NPC 8 20 true A key lies nearby...
