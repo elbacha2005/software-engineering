@@ -70,26 +70,32 @@ public class NPC extends entity implements Drawable {
     // Update NPC position and animation each frame
     public void update() {
         if (!stationary) {
-            // Random movement AI for moving NPCs
-            actionCounter++; // Increment frame counter
+            // Random movement AI
+            actionCounter++;
             if (actionCounter >= actionInterval) {
-                // Pick random direction every actionInterval frames
-                int rand = (int)(Math.random() * 100);
+                // Random direction
+                int rand = (int) (Math.random() * 100);
                 if (rand < 25) direction = "up";
                 else if (rand < 50) direction = "down";
                 else if (rand < 75) direction = "left";
                 else direction = "right";
 
-                actionCounter = 0; // Reset counter
+                actionCounter = 0;
             }
 
-            // Check for collisions with tiles and other NPCs
-            collisionOn = false;
-            gamePanel.collisionChecker.checkTile(this); // Check tile collision
-            gamePanel.collisionChecker.checkNPCCollision(this); // Check NPC-to-NPC collision
+            // Predict future position by 5 pixels
+            int predictX = worldX;
+            int predictY = worldY;
+            switch (direction) {
+                case "up": predictY -= 5; break;
+                case "down": predictY += 5; break;
+                case "left": predictX -= 5; break;
+                case "right": predictX += 5; break;
+            }
 
-            // Move if no collision detected
-            if (!collisionOn) {
+            // Check if future position would collide
+            if (!gamePanel.collisionChecker.checkAllCollisions(this, predictX, predictY)) {
+                // Move if clear
                 switch (direction) {
                     case "up": worldY -= speed; break;
                     case "down": worldY += speed; break;
@@ -98,29 +104,29 @@ public class NPC extends entity implements Drawable {
                 }
             }
 
-            // Update animation frame
+            // Animate
             long now = System.nanoTime();
             if (now - lastFrameTime > frameDelay) {
-                spriteNum++; // Next frame
-                if (spriteNum > 4) spriteNum = 1; // Loop back to frame 1
+                spriteNum++;
+                if (spriteNum > 4) spriteNum = 1;
                 lastFrameTime = now;
             }
         } else {
-            // Stationary NPC - only play idle animation
+            // Stationary NPC - just idle animation
             direction = "idle";
             long now = System.nanoTime();
             if (now - lastFrameTime > frameDelay) {
-                spriteNum++; // Next frame
-                if (spriteNum > 4) spriteNum = 1; // Loop back to frame 1
+                spriteNum++;
+                if (spriteNum > 4) spriteNum = 1;
                 lastFrameTime = now;
             }
         }
     }
 
-    // Get Y position for draw order sorting (entities at bottom of screen drawn last)
+
     @Override
     public int getSortY() {
-        return worldY + solidArea.y + solidArea.height; // Bottom of collision box
+        return worldY + solidArea.y + solidArea.height; // Bottom Y for consistent sorting
     }
 
     // Draw the NPC sprite on screen

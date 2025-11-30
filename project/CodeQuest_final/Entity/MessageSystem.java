@@ -7,6 +7,9 @@ public class MessageSystem {
 
     private String currentMessage = ""; // Current message to display
     private boolean showMessage = false; // Whether to show the message bar
+    private boolean isPrintMessage = false; // Whether message is from print() command
+    private long printMessageStartTime = 0; // When print message started
+    private long printMessageDuration = 2000; // Duration to show print messages (2 seconds)
 
     private int screenWidth; // Screen width for centering
     private int screenHeight; // Screen height for positioning
@@ -19,21 +22,40 @@ public class MessageSystem {
         this.screenHeight = screenHeight;
     }
 
-    // Set and show a new message
+    // Set and show a new message (for NPCs)
     public void showMessage(String message) {
         this.currentMessage = message;
         this.showMessage = true;
+        this.isPrintMessage = false;
     }
 
-    // Hide the message bar
+    // Set and show a print() command message with duration
+    public void showPrintMessage(String message) {
+        this.currentMessage = message;
+        this.showMessage = true;
+        this.isPrintMessage = true;
+        this.printMessageStartTime = System.currentTimeMillis();
+    }
+
+    // Hide the message bar (only hides NPC messages, not print messages)
     public void hideMessage() {
-        this.showMessage = false;
-        this.currentMessage = "";
+        if (!isPrintMessage) {
+            this.showMessage = false;
+            this.currentMessage = "";
+        }
     }
 
-    // Check if a message is currently being shown
-    public boolean isShowingMessage() {
-        return showMessage;
+    // Update message state (call this in game loop)
+    public void update() {
+        // Auto-hide print messages after duration
+        if (isPrintMessage && showMessage) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - printMessageStartTime >= printMessageDuration) {
+                this.showMessage = false;
+                this.currentMessage = "";
+                this.isPrintMessage = false;
+            }
+        }
     }
 
     // Draw the message bar at the bottom of the screen

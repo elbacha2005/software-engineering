@@ -1,11 +1,17 @@
 package CodeQuest.Entity;
 
+import CodeQuest.Main.Observer;
+import CodeQuest.Main.Subject;
 import CodeQuest.Tiles.AssetHandler;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 // Manages key collection display with counter
-public class KeySystem {
+public class KeySystem implements Subject {
+
+    private List<Observer> observers = new ArrayList<>();
 
     private int maxKeys = 5; // Maximum keys to collect
     private int currentKeys = 0; // Current keys collected
@@ -25,27 +31,17 @@ public class KeySystem {
     public void addKey() {
         if (currentKeys < maxKeys) {
             currentKeys++;
+            notifyObservers();
         }
     }
 
     // Reset keys to 0
     public void resetKeys() {
         currentKeys = 0;
+        notifyObservers();
     }
 
-    // Draw key icon with counter text next to it
-    public void draw(Graphics2D g2) {
-        // Draw key icon
-        if (keyFull != null) {
-            g2.drawImage(keyFull, screenX, screenY, keySize, keySize, null);
-        }
 
-        // Draw counter text next to key
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.setColor(Color.WHITE);
-        String text = ": " + currentKeys;
-        g2.drawString(text, screenX + keySize + 5, screenY + 22); // Position text next to key
-    }
 
     // Get current number of keys collected
     public int getCurrentKeys() {
@@ -56,5 +52,22 @@ public class KeySystem {
     public void setScreenPosition(int x, int y) {
         this.screenX = x;
         this.screenY = y;
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void unregisterObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
 }

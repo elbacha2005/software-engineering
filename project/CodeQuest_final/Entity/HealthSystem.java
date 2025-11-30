@@ -1,11 +1,18 @@
 package CodeQuest.Entity;
 
+import CodeQuest.Main.Observer;
+import CodeQuest.Main.Subject;
 import CodeQuest.Tiles.AssetHandler;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 // Manages player health, displays hearts, and shows game over screen
-public class HealthSystem {
+public class HealthSystem implements Subject {
+
+    private List<Observer> observers = new ArrayList<>();
 
     private int maxHealth = 5; // Maximum health (5 hearts)
     private int currentHealth = 5; // Current health remaining
@@ -34,6 +41,7 @@ public class HealthSystem {
             currentHealth = 0; // Clamp to 0
             isDead = true; // Mark as dead
         }
+        notifyObservers();
         return true; // Damage applied successfully
     }
 
@@ -41,18 +49,10 @@ public class HealthSystem {
     public void resetHealth() {
         currentHealth = maxHealth;
         isDead = false;
+        notifyObservers();
     }
 
-    // Draw hearts on screen (full hearts for current health, empty for lost health)
-    public void draw(Graphics2D g2) {
-        int x = screenX;
-        int y = screenY;
-        for (int i = 0; i < maxHealth; i++) {
-            BufferedImage heartImage = (i < currentHealth) ? heartFull : heartEmpty; // Choose full or empty
-            g2.drawImage(heartImage, x, y, heartSize, heartSize, null);
-            x += heartSize + heartSpacing; // Move to next heart position
-        }
-    }
+
 
     // Helper method to draw a styled button (menu style) with centered text
     private void drawStyledButton(Graphics2D g2, int x, int y, int w, int h, String text, boolean selected) {
@@ -177,6 +177,10 @@ public class HealthSystem {
         return currentHealth;
     }
 
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
     // Check if player is dead
     public boolean isDead() {
         return isDead;
@@ -186,5 +190,22 @@ public class HealthSystem {
     public void setScreenPosition(int x, int y) {
         this.screenX = x;
         this.screenY = y;
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void unregisterObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
 }

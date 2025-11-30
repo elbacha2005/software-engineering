@@ -1,11 +1,17 @@
 package CodeQuest.Entity;
 
+import CodeQuest.Main.Observer;
+import CodeQuest.Main.Subject;
 import CodeQuest.Tiles.AssetHandler;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 // Manages chest counter display - counts down as chests are opened
-public class ChestSystem {
+public class ChestSystem implements Subject {
+
+    private List<Observer> observers = new ArrayList<>();
 
     private int maxChests = 4; // Total chests in game
     private int remainingChests = 4; // Chests not yet opened
@@ -25,27 +31,17 @@ public class ChestSystem {
     public void openChest() {
         if (remainingChests > 0) {
             remainingChests--;
+            notifyObservers();
         }
     }
 
     // Reset chest count to maximum
     public void resetChests() {
         remainingChests = maxChests;
+        notifyObservers();
     }
 
-    // Draw chest icon with counter text next to it
-    public void draw(Graphics2D g2) {
-        // Draw chest icon
-        if (chestIcon != null) {
-            g2.drawImage(chestIcon, screenX, screenY, iconSize, iconSize, null);
-        }
 
-        // Draw counter text next to chest
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.setColor(Color.WHITE);
-        String text = ": " + remainingChests;
-        g2.drawString(text, screenX + iconSize + 5, screenY + 22); // Position text next to chest
-    }
 
     // Get current number of remaining chests
     public int getRemainingChests() {
@@ -56,5 +52,22 @@ public class ChestSystem {
     public void setScreenPosition(int x, int y) {
         this.screenX = x;
         this.screenY = y;
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void unregisterObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
 }

@@ -51,8 +51,8 @@ public class Player extends entity implements Drawable {
 
     // Reset player to default starting state
     public void setDefault() {
-        worldX = 1000; // Starting world position
-        worldY = 1000;
+        worldX = 1536; // Starting world position (24*64)
+        worldY = 1600; // (25*64)
         speed = 4; // Keyboard movement speed
         direction = "down"; // Start facing down
         getPlayerImage(); // Load sprites
@@ -87,90 +87,72 @@ public class Player extends entity implements Drawable {
         sprites[4][3] = AssetHandler.getInstance().getImage("player_idle4");
     }
 
-    // Check if player will collide when moving in direction at speed
-    private boolean checkCollision(String dir, int spd) {
-        collisionOn = false;
-        gamePanel.collisionChecker.checkTile(this); // Check tile collision
-        if (collisionOn) return true; // Blocked by tile
-
-        // Calculate future position rectangle
-        Rectangle futureRect = new Rectangle(worldX + solidArea.x, worldY + solidArea.y, solidArea.width, solidArea.height);
-        switch (dir) {
-            case "up": futureRect.y -= spd; break;
-            case "down": futureRect.y += spd; break;
-            case "left": futureRect.x -= spd; break;
-            case "right": futureRect.x += spd; break;
-        }
-        // Check collision with all NPCs
-        for (NPC npc : gamePanel.npcM.npcs) {
-            Rectangle npcRect = new Rectangle(npc.worldX + npc.solidArea.x, npc.worldY + npc.solidArea.y, npc.solidArea.width, npc.solidArea.height);
-            if (futureRect.intersects(npcRect)) {
-                return true; // Collision with NPC
-            }
-        }
-        return false; // No collision
-    }
-
-    // Move player in direction at speed
-    private void move(String dir, int spd) {
-        switch (dir) {
-            case "up": worldY -= spd; break;
-            case "down": worldY += spd; break;
-            case "left": worldX -= spd; break;
-            case "right": worldX += spd; break;
-        }
-    }
-
-    // Update animation frame based on delay
-    private void updateAnimation(long delay) {
-        long now = System.nanoTime();
-        if (now - lastFrameTime > delay) { // Time for next frame?
-            spriteNum++; // Next frame
-            if (spriteNum > 4) spriteNum = 1; // Loop back to frame 1
-            lastFrameTime = now;
-        }
-    }
-
-    // Update player each frame - handles both command and keyboard movement
     public void update() {
-        // Priority 1: Execute command-based movement if active
+        // Handle command movement
         if (commandDirection != null && System.currentTimeMillis() < commandMoveEndTime) {
-            direction = commandDirection; // Set direction from command
-            if (!checkCollision(direction, commandSpeed)) { // Check if path is clear
-                move(direction, commandSpeed); // Move at command speed
-                updateAnimation(commandFrameDelay); // Animate at command speed
+            direction = commandDirection;
+            // Predict future position by 5 pixels
+            int predictX = worldX;
+            int predictY = worldY;
+            switch (direction) {
+                case "up": predictY -= 5; break;
+                case "down": predictY += 5; break;
+                case "left": predictX -= 5; break;
+                case "right": predictX += 5; break;
+            }
+
+            // Check if future position would collide
+            if (!gamePanel.collisionChecker.checkAllCollisions(this, predictX, predictY)) {
+                // Move if clear
+                switch (direction) {
+                    case "up": worldY -= commandSpeed; break;
+                    case "down": worldY += commandSpeed; break;
+                    case "left": worldX -= commandSpeed; break;
+                    case "right": worldX += commandSpeed; break;
+                }
             } else {
-                // Hit obstacle, cancel command
+                // Stop command on predicted collision
                 commandDirection = null;
                 commandMoveEndTime = 0;
             }
+            // Update animation with faster delay
+            long now = System.nanoTime();
+            if (now - lastFrameTime > commandFrameDelay) {
+                spriteNum++;
+                if (spriteNum > 4) spriteNum = 1;
+                lastFrameTime = now;
+            }
         } else if (commandDirection != null) {
-            // Command time expired
+            // Time expired, stop command movement
             commandDirection = null;
         }
 
-        // Check if command system is currently executing commands
+        // No keyboard control - only commands or idle
         boolean commandsExecuting = (gamePanel.commandParser != null && gamePanel.commandParser.isExecuting());
 
-        // Priority 2: Keyboard input (only if commands are executing)
-        if (commandsExecuting && (keyH.UpPressed || keyH.DownPressed || keyH.LeftPressed || keyH.RightPressed)) {
-            if (keyH.UpPressed) direction = "up";
-            if (keyH.DownPressed) direction = "down";
-            if (keyH.LeftPressed) direction = "left";
-            if (keyH.RightPressed) direction = "right";
-
-            if (!checkCollision(direction, speed)) { // Check if path is clear
-                move(direction, speed); // Move at keyboard speed
-            }
-            updateAnimation(frameDelay); // Animate
-        } else if (!commandsExecuting) {
-            // No commands executing - show idle animation
+        if (!commandsExecuting) {
+            // Only set to idle if not moving and commands aren't executing
             direction = "idle";
-            updateAnimation(frameDelay);
+            long now = System.nanoTime();
+            if (now - lastFrameTime > frameDelay) {
+                spriteNum++;
+                if (spriteNum > 4) {
+                    spriteNum = 1;
+                }
+                lastFrameTime = now;
+            }
         } else {
-            // Commands executing but no keyboard input - still animate
-            updateAnimation(frameDelay);
+            // Commands are executing - just update animation
+            long now = System.nanoTime();
+            if (now - lastFrameTime > frameDelay) {
+                spriteNum++;
+                if (spriteNum > 4) {
+                    spriteNum = 1;
+                }
+                lastFrameTime = now;
+            }
         }
+
     }
 
     // Get Y position for draw order sorting (entities at bottom drawn last)
