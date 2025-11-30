@@ -162,32 +162,128 @@ Structures: Enclosed areas with walls
 ### Project Structure
 
 ```
-CodeQuest/
-├── Main/
-│   ├── Main.java              # Application entry point
-│   ├── GamePanel.java         # Game loop, rendering pipeline
-│   ├── KeyHandler.java        # Input event handling
-│   ├── CollisionChecker.java  # Collision detection system
-│   ├── Drawable.java          # Drawing interface
-│   ├── GUI.java               # UI and pause screen
-│   └── ButtonGUI.java         # Button interface
-├── Entity/
-│   ├── entity.java            # Base entity class
-│   ├── Player.java            # Player character logic
-│   ├── NPC.java               # NPC character logic
-│   └── NPCManager.java        # NPC loading and management
-├── Tiles/
-│   ├── Tile.java              # Tile data structure
-│   ├── TileManager.java       # Map loading and rendering
-│   ├── MapObject.java         # Object data structure
-│   ├── ObjectManager.java     # Object loading and management
-│   └── AssetHandler.java      # Asset loading system
-└── res/
-    ├── player/                # Player sprite sheets
-    ├── tiles/                 # Tile textures and objects
-    ├── Maps/                  # Level data files (WorldMap2.txt, Objects.txt, NPCs.txt)
-      # + more textures 
-```
+CodeQuest_finalVErsion/
+  │
+  ├── Entity/                          # Game entities and systems
+  │   ├── entity.java                     # Base class for all game entities
+  │   ├── Player.java                     # Player character with command-based movement
+  │   ├── NPC.java                        # Non-Player Character with AI behavior
+  │   ├── NPCManager.java                 # Manages all NPCs in the game world
+  │   ├── HealthSystem.java               # Player health management (Observer pattern)
+  │   ├── KeySystem.java                  # Key collection tracking (Observer pattern)
+  │   ├── ChestSystem.java                # Chest counter system (Observer pattern)
+  │   └── MessageSystem.java              # NPC dialogue and print() message display
+  │
+  ├── Main/                            # Core game engine and UI
+  │   ├── Main.java                       # Application entry point
+  │   ├── GamePanel.java                  # Main game loop and rendering
+  │   ├── KeyHandler.java                 # Keyboard input handling
+  │   ├── CollisionChecker.java           # Collision detection system
+  │   │
+  │   ├── CommandParser.java              # Python-like command parser (loops, conditions)
+  │   ├── CommandAdapter.java             # Command queue with smooth movement
+  │   ├── CommandInputPanel.java          # Command input UI panel
+  │   │
+  │   ├── MenuManager.java                # Menu state and music management
+  │   ├── TitleScreen.java                # Animated title screen
+  │   ├── MainMenu.java                   # Main menu interface
+  │   ├── PauseMenu.java                  # Pause menu overlay
+  │   ├── OptionsMenu.java                # Game options menu
+  │   │
+  │   ├── GameUI.java                     # HUD display (health, keys, chests)
+  │   ├── SoundManager.java               # Audio system (music and SFX)
+  │   │
+  │   ├── Drawable.java                   # Interface for renderable entities
+  │   ├── Observer.java                   # Observer pattern interface
+  │   └── Subject.java                    # Subject pattern interface
+  │
+  ├── Tiles/                           # Map and object management
+  │   ├── Tile.java                       # Single tile definition
+  │   ├── TileManager.java                # Tile rendering and map loading
+  │   ├── MapObject.java                  # Interactive game objects
+  │   ├── ObjectManager.java              # Manages all map objects
+  │   ├── GameObjectFactory.java          # Factory pattern for object creation
+  │   └── AssetHandler.java               # Singleton for asset loading and caching
+  │
+  ├── res/                             # Game resources
+  │   │
+  │   ├── 🎵 audio/                       # Sound files
+  │   │   ├── menu.wav                    # Menu background music
+  │   │   ├── town.wav                    # Gameplay background music
+  │   │   └── life_reg.wav                # Navigation sound effect
+  │   │
+  │   ├── Maps/                        # Game world data
+  │   │   ├── WorldMap2.txt               # Active tile map (50x50 grid)
+  │   │   ├── Objects.txt                 # Object placement data
+  │   │   ├── NPCs.txt                    # NPC spawn positions and dialogue
+  │   │   ├── WorldMap.txt                # Legacy map (unused)
+  │   │   └── Map1.txt                    # Legacy map (unused)
+  │   │
+  │   ├── player/                      # Player sprite animations
+  │   │   ├── idle_down/                  # Idle animation (8 frames)
+  │   │   ├── run_up/                     # Run up animation (8 frames)
+  │   │   ├── run_down/                   # Run down animation (8 frames)
+  │   │   ├── run_left/                   # Run left animation (8 frames)
+  │   │   └── run_right/                  # Run right animation (8 frames)
+  │   │
+  │   └── tiles/                       # Game world graphics
+  │       │
+  │       ├── Beach/                      # Beach border tiles
+  │       │   ├── beach_up.png
+  │       │   ├── beach_down.png
+  │       │   ├── beach_left.png
+  │       │   ├── beach_right.png
+  │       │   ├── beach_top_left.png
+  │       │   ├── beach_top_right.png
+  │       │   ├── beach_bottom_left.png
+  │       │   └── beach_bottom_right.png
+  │       │
+  │       ├── Nature/                     # Terrain and vegetation
+  │       │   ├── terrain1.png            # Grass variant 1
+  │       │   ├── terrain2.png            # Grass variant 2
+  │       │   ├── terrain3.png            # Grass variant 3
+  │       │   ├── Path.png                # Path tile
+  │       │   ├── stone_tile.png          # Stone ground
+  │       │   ├── tree1.png               # Tree variant 1 (256x256)
+  │       │   ├── tree2.png               # Tree variant 2 (256x256)
+  │       │   ├── bush1.png               # Bush variant 1
+  │       │   └── bush2.png               # Bush variant 2
+  │       │
+  │       ├── Props/                      # Interactive objects
+  │       │   ├── chest1.png              # Closed chest variant 1
+  │       │   ├── chest1_open.png         # Open chest variant 1
+  │       │   ├── chest2.png              # Closed chest variant 2
+  │       │   ├── chest2_open.png         # Open chest variant 2
+  │       │   ├── chest3.png              # Closed chest variant 3
+  │       │   ├── chest3_open.png         # Open chest variant 3
+  │       │   ├── chest4.png              # Closed chest variant 4
+  │       │   ├── chest4_open.png         # Open chest variant 4
+  │       │   ├── Key1.png                # Key animation frame 1
+  │       │   ├── key2.png                # Key animation frame 2
+  │       │   ├── Key3.png                # Key animation frame 3
+  │       │   ├── Key4.png                # Key animation frame 4
+  │       │   ├── Wall_Tiles.png          # Standard wall
+  │       │   ├── Wall_Tiles_side.png     # Side wall
+  │       │   ├── top_corner.png          # Top corner wall
+  │       │   ├── bottom_corner.png       # Bottom corner wall
+  │       │   └── Deco_skeleto_sitdown.png # Skeleton decoration
+  │       │
+  │       ├── Icons/                      # UI elements
+  │       │   ├── full_heart.png          # Full health heart
+  │       │   ├── empty_heart.png         # Empty health heart
+  │       │   ├── full_key.png            # Key counter icon
+  │       │   ├── chest_counter.png       # Chest counter icon
+  │       │   ├── MainMenue.png           # Menu background
+  │       │   ├── Game_over.png           # Game over screen
+  │       │   └── win.png                 # Victory screen
+  │       │
+  │       └── NPC/                        # NPC sprites
+  │           └── NPC1/                   # NPC variant 1
+  │               ├── NPC_idle1.png       # Idle frame 1
+  │               ├── NPC_idle2.png       # Idle frame 2
+  │               ├── NPC_idle3.png       # Idle frame 3
+  │               └── NPC_idle4.png       # Idle frame 4
+
 
 ### Core Systems
 
@@ -256,8 +352,8 @@ CodeQuest/
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/Yunsmn/CodeQuest.git
-   cd CodeQuest
+   git clone https://github.com/elbacha2005/software-engineering/tree/main/project/CodeQuest_final
+   cd CodeQuest_final
    ```
 
 2. **Open in IDE**
