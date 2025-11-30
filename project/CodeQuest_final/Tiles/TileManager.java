@@ -69,8 +69,10 @@ public class TileManager {
 
         // Water tile with collision
         tiles[3] = new Tile();
-        tiles[3].image = AssetHandler.getInstance().getImage("water");
-        tiles[3].collision = true; // Water blocks movement
+        tiles[3].image = AssetHandler.getInstance().getImage("ground");
+
+        tiles[4] = new Tile();
+        tiles[4].image = AssetHandler.getInstance().getImage("path");
     }
 
     // Renders visible tiles to the screen
@@ -94,7 +96,7 @@ public class TileManager {
                     worldX - gamePanel.gameTileSize < gamePanel.player.worldX + gamePanel.player.screenX &&
                     worldY - 4*gamePanel.gameTileSize < gamePanel.player.worldY + gamePanel.player.screenY) {
                  int tileNum = mapTile[worldCol][worldRow]; // Get tile ID
-                 if ( 0 <= tileNum && tileNum <= 3 ) { // Validate tile ID
+                 if ( 0 <= tileNum && tileNum <= 4 ) { // Validate tile ID
                      BufferedImage img = tiles[tileNum].image;
                      if (img != null) {
                          // Draw tile image

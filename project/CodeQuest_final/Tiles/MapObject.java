@@ -45,7 +45,7 @@ public class MapObject implements Drawable {
     // Get Y position for draw order sorting
     @Override
     public int getSortY() {
-        return worldY + solidArea.y + (int)hoverY; // Include hover offset
+        return worldY + solidArea.y + solidArea.height + (int)hoverY; // Include hover offset
     }
 
     // Draw object with custom rendering for different object types
@@ -58,6 +58,13 @@ public class MapObject implements Drawable {
             } else {
                 g2.setColor(Color.BLUE); // Fallback color
                 g2.fillRect(screenX - 64, screenY - 64, 256, 256);
+            }
+        } else if (name.equals("wall2") || name.equals("wall3")) {
+            if (image != null) {
+                g2.drawImage(image, screenX , screenY - 32, 64, 96, null);
+            } else  {
+                g2.setColor(Color.BLUE);
+                g2.fillRect(screenX , screenY - 64, 64, 96);
             }
         } else if (name.equals("bush")) {
             if (image != null) {

@@ -57,44 +57,51 @@ public class AssetHandler {
         loadImage("beach_top_right", "/CodeQuest/res/tiles/Beach/beach_top_right.png");
         loadImage("beach_bottom_left", "/CodeQuest/res/tiles/Beach/beach_bottom_left.png");
         loadImage("beach_bottom_right", "/CodeQuest/res/tiles/Beach/beach_bottom_right.png");
-        loadImage("tree", "/CodeQuest/res/tiles/tree2.png");
-        loadImage("terrain1", "/CodeQuest/res/tiles/terrain1.png");
-        loadImage("tree1", "/CodeQuest/res/tiles/tree1.png");
-        loadImage("terrain2", "/CodeQuest/res/tiles/terrain2.png");
-        loadImage("terrain3", "/CodeQuest/res/tiles/terrain3.png");
-        loadImage("bush1", "/CodeQuest/res/tiles/bush1.png");
-        loadImage("bush2", "/CodeQuest/res/tiles/bush2.png");
+        loadImage("tree", "/CodeQuest/res/tiles/Nature/tree2.png");
+        loadImage("terrain1", "/CodeQuest/res/tiles/Nature/terrain1.png");
+        loadImage("tree1", "/CodeQuest/res/tiles/Nature/tree1.png");
+        loadImage("terrain2", "/CodeQuest/res/tiles/Nature/terrain2.png");
+        loadImage("terrain3", "/CodeQuest/res/tiles/Nature/terrain3.png");
+        loadImage("bush1", "/CodeQuest/res/tiles/Nature/bush1.png");
+        loadImage("bush2", "/CodeQuest/res/tiles/Nature/bush2.png");
+        loadImage("path", "/CodeQuest/res/tiles/Nature/Path.png");
+        loadImage("ground", "/CodeQuest/res/tiles/Nature/stone_tile.png");
 
-        loadImage("NPC_idle1", "/CodeQuest/res/tiles/NPC_idle1.png");
-        loadImage("NPC_idle2", "/CodeQuest/res/tiles/NPC_Idle2.png");
-        loadImage("NPC_idle3", "/CodeQuest/res/tiles/NPC_Idle3.png");
-        loadImage("NPC_idle4", "/CodeQuest/res/tiles/NPC_Idle4.png");
+        loadImage("NPC_idle1", "/CodeQuest/res/tiles/NPC/NPC1/NPC_idle1.png");
+        loadImage("NPC_idle2", "/CodeQuest/res/tiles/NPC/NPC1/NPC_Idle2.png");
+        loadImage("NPC_idle3", "/CodeQuest/res/tiles/NPC/NPC1/NPC_Idle3.png");
+        loadImage("NPC_idle4", "/CodeQuest/res/tiles/NPC/NPC1/NPC_Idle4.png");
 
-        loadImage("background", "/CodeQuest/res/tiles/MainMenue.png");
+        loadImage("background", "/CodeQuest/res/tiles/Icons/MainMenue.png");
 
-        loadImage("heart","/CodeQuest/res/tiles/full_heart.png");
-        loadImage("broken_heart", "/CodeQuest/res/tiles/empty_heart.png");
+        loadImage("heart","/CodeQuest/res/tiles/Icons/full_heart.png");
+        loadImage("broken_heart", "/CodeQuest/res/tiles/Icons/empty_heart.png");
 
-        loadImage("full_key", "/CodeQuest/res/tiles/full_key.png");
+        loadImage("full_key", "/CodeQuest/res/tiles/Icons/full_key.png");
 
-        loadImage("game_over", "/CodeQuest/res/tiles/Game_over.png");
-        loadImage("win", "/CodeQuest/res/tiles/win.png");
+        loadImage("game_over", "/CodeQuest/res/tiles/Icons/Game_over.png");
+        loadImage("win", "/CodeQuest/res/tiles/Icons/win.png");
 
-        loadImage("key1", "/CodeQuest/res/tiles/Key1.png");
-        loadImage("key2", "/CodeQuest/res/tiles/key2.png");
-        loadImage("key3", "/CodeQuest/res/tiles/Key3.png");
-        loadImage("key4", "/CodeQuest/res/tiles/Key4.png");
+        loadImage("key1", "/CodeQuest/res/tiles/Props/Key1.png");
+        loadImage("key2", "/CodeQuest/res/tiles/Props/key2.png");
+        loadImage("key3", "/CodeQuest/res/tiles/Props/Key3.png");
+        loadImage("key4", "/CodeQuest/res/tiles/Props/Key4.png");
 
-        loadImage("chest1",  "/CodeQuest/res/tiles/chest1.png");
-        loadImage("chest2",  "/CodeQuest/res/tiles/chest2.png");
-        loadImage("chest3",  "/CodeQuest/res/tiles/chest3.png");
-        loadImage("chest4",  "/CodeQuest/res/tiles/chest4.png");
+        loadImage("chest1",  "/CodeQuest/res/tiles/Props/chest1.png");
+        loadImage("chest2",  "/CodeQuest/res/tiles/Props/chest2.png");
+        loadImage("chest3",  "/CodeQuest/res/tiles/Props/chest3.png");
+        loadImage("chest4",  "/CodeQuest/res/tiles/Props/chest4.png");
 
-        loadImage("chest1_open",  "/CodeQuest/res/tiles/chest1_open.png");
-        loadImage("chest2_open",  "/CodeQuest/res/tiles/chest2_open.png");
-        loadImage("chest3_open",  "/CodeQuest/res/tiles/chest3_open.png");
-        loadImage("chest4_open",  "/CodeQuest/res/tiles/chest4_open.png");
+        loadImage("chest1_open",  "/CodeQuest/res/tiles/Props/chest1_open.png");
+        loadImage("chest2_open",  "/CodeQuest/res/tiles/Props/chest2_open.png");
+        loadImage("chest3_open",  "/CodeQuest/res/tiles/Props/chest3_open.png");
+        loadImage("chest4_open",  "/CodeQuest/res/tiles/Props/chest4_open.png");
 
+        loadImage("wall", "/CodeQuest/res/tiles/Props/Wall_Tiles.png");
+        loadImage("wall_top_corner","/CodeQuest/res/tiles/Props/top_corner.png");
+        loadImage("wall_bottom_corner","/CodeQuest/res/tiles/Props/bottom_corner.png");
+        loadImage("wall_side","/CodeQuest/res/tiles/Props/Wall_Tiles_side.png");
+        loadImage("skeleton", "/CodeQuest/res/tiles/Props/Deco_skeleto_sitdown.png");
 
     }
 
