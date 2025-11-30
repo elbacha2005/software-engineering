@@ -46,12 +46,11 @@ public class GamePanel extends JPanel implements Runnable {
     public KeySystem keySystem = new KeySystem(); // Key collection system
     public ChestSystem chestSystem = new ChestSystem(); // Chest counter system
     public MessageSystem messageSystem; // NPC message display system
+    public GameUI gameUI; // UI observer for health, keys, and chests
 
     // World settings
     public final int maxWorldCol = 50; // World width in tiles
     public final int maxWorldRow = 50; // World height in tiles
-
-    GUI ui = new GUI(this); // UI overlay
 
     public CommandParser commandParser; // Command parser for Python commands
     public SoundManager soundManager; // Sound manager for music and effects
@@ -126,6 +125,12 @@ public class GamePanel extends JPanel implements Runnable {
         // Initialize message system
         messageSystem = new MessageSystem(screenWidth, screenHeight);
 
+        // Initialize GameUI and register it with the systems
+        gameUI = new GameUI(healthSystem, keySystem, chestSystem);
+        healthSystem.registerObserver(gameUI);
+        keySystem.registerObserver(gameUI);
+        chestSystem.registerObserver(gameUI);
+
         // Start at title screen
         this.gameState = titleState;
         this.setVisible(false);
@@ -156,7 +161,11 @@ public class GamePanel extends JPanel implements Runnable {
 
             // Update and render at target FPS
             if (deltaTime >= 1) {
-                update();
+                try {
+                    update();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 repaint();
                 deltaTime--;
                 frames++;
@@ -170,7 +179,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     // Updates game state
-    public void update() {
+    public void update() throws InterruptedException {
         if (gameState == playState) {
             player.update(); // Update player
             npcM.update(); // Update NPCs
@@ -198,7 +207,7 @@ public class GamePanel extends JPanel implements Runnable {
                     int distance = (int) Math.sqrt(Math.pow(playerCenterX - chestCenterX, 2) + Math.pow(playerCenterY - chestCenterY, 2));
 
                     // Open chest if player is within 1.5 tiles distance
-                    if (distance < gameTileSize * 1.5) {
+                    if (distance < gameTileSize ) {
                         obj.opened = true; // Open chest
                         player.keys--; // Decrement key count
                         keySystem.resetKeys(); // Reset visual display
@@ -226,7 +235,7 @@ public class GamePanel extends JPanel implements Runnable {
                     int distance = (int) Math.sqrt(Math.pow(playerCenterX - npcCenterX, 2) + Math.pow(playerCenterY - npcCenterY, 2));
 
                     // Show message if player is within 2 tiles of NPC
-                    if (distance < gameTileSize * 2) {
+                    if (distance < gameTileSize * 1.5) {
                         messageSystem.showMessage(npc.dialogue);
                         nearNPC = true;
                         break; // Show only one message at a time
@@ -242,6 +251,9 @@ public class GamePanel extends JPanel implements Runnable {
             if (commandParser != null && commandParser.adapter != null) {
                 commandParser.adapter.update();
             }
+
+            // Update message system to auto-hide print messages after duration
+            messageSystem.update();
 
             // Check for victory (all chests opened) - check BEFORE death
             if (chestSystem.getRemainingChests() == 0 && gameState == playState) {
@@ -325,51 +337,47 @@ public class GamePanel extends JPanel implements Runnable {
                 d.draw(g2, pos[0], pos[1]);
             }
         }
-        g2.setColor(Color.RED);
-        for (Object o : objM.objects) {
-            if (o instanceof MapObject) {
-                MapObject obj = (MapObject) o;
-                if (obj.collision) {
-                    g2.setColor(Color.RED);
-                    int screenX = obj.worldX - player.worldX + player.screenX;
-                    int screenY = obj.worldY - player.worldY + player.screenY;
-                    if (obj.worldX + gameTileSize > player.worldX - player.screenX &&
-                            obj.worldX - gameTileSize < player.worldX + player.screenX) {
-                        g2.drawRect(screenX + obj.solidArea.x, screenY + obj.solidArea.y, obj.solidArea.width, obj.solidArea.height);
-                    }
-                } else {
-                    g2.setColor(Color.cyan);
-                    int screenX = obj.worldX - player.worldX + player.screenX;
-                    int screenY = obj.worldY - player.worldY + player.screenY;
-                    if (obj.worldX + gameTileSize > player.worldX - player.screenX &&
-                            obj.worldX - gameTileSize < player.worldX + player.screenX) {
-                        g2.drawRect(screenX + obj.solidArea.x, screenY + obj.solidArea.y, obj.solidArea.width, obj.solidArea.height);
-                    }
-                }
-            }
-        }
-        // Draw player collision rect
-        g2.setColor(Color.BLUE);
-        g2.drawRect(player.screenX + player.solidArea.x, player.screenY + player.solidArea.y, player.solidArea.width, player.solidArea.height);
-
-        // Draw NPC collision rect
-        g2.setColor(Color.GREEN);
-        for (NPC npc : npcM.npcs) {
-            if (npc.worldX + gameTileSize > player.worldX - player.screenX &&
-                    npc.worldX - gameTileSize < player.worldX + player.screenX) {
-                int screenX = npc.worldX - player.worldX + player.screenX;
-                int screenY = npc.worldY - player.worldY + player.screenY;
-                g2.drawRect(screenX + npc.solidArea.x, screenY + npc.solidArea.y, npc.solidArea.width, npc.solidArea.height);
-            }
-        }
+//        g2.setColor(Color.RED);
+//        for (Object o : objM.objects) {
+//            if (o instanceof MapObject) {
+//                MapObject obj = (MapObject) o;
+//                if (obj.collision) {
+//                    g2.setColor(Color.RED);
+//                    int screenX = obj.worldX - player.worldX + player.screenX;
+//                    int screenY = obj.worldY - player.worldY + player.screenY;
+//                    if (obj.worldX + gameTileSize > player.worldX - player.screenX &&
+//                            obj.worldX - gameTileSize < player.worldX + player.screenX) {
+//                        g2.drawRect(screenX + obj.solidArea.x, screenY + obj.solidArea.y, obj.solidArea.width, obj.solidArea.height);
+//                    }
+//                } else {
+//                    g2.setColor(Color.cyan);
+//                    int screenX = obj.worldX - player.worldX + player.screenX;
+//                    int screenY = obj.worldY - player.worldY + player.screenY;
+//                    if (obj.worldX + gameTileSize > player.worldX - player.screenX &&
+//                            obj.worldX - gameTileSize < player.worldX + player.screenX) {
+//                        g2.drawRect(screenX + obj.solidArea.x, screenY + obj.solidArea.y, obj.solidArea.width, obj.solidArea.height);
+//                    }
+//                }
+//            }
+//        }
+//        // Draw player collision rect
+//        g2.setColor(Color.BLUE);
+//        g2.drawRect(player.screenX + player.solidArea.x, player.screenY + player.solidArea.y, player.solidArea.width, player.solidArea.height);
+//
+//        // Draw NPC collision rect
+//        g2.setColor(Color.GREEN);
+//        for (NPC npc : npcM.npcs) {
+//            if (npc.worldX + gameTileSize > player.worldX - player.screenX &&
+//                    npc.worldX - gameTileSize < player.worldX + player.screenX) {
+//                int screenX = npc.worldX - player.worldX + player.screenX;
+//                int screenY = npc.worldY - player.worldY + player.screenY;
+//                g2.drawRect(screenX + npc.solidArea.x, screenY + npc.solidArea.y, npc.solidArea.width, npc.solidArea.height);
+//            }
+//        }
 
         if (gameState == playState || gameState == pauseState) {
-            healthSystem.draw(g2);
-            keySystem.draw(g2);
-            chestSystem.draw(g2);
+            gameUI.draw(g2);
         }
-
-        ui.draw(g2);
 
         // Draw message bar on top of everything (if active)
         if (gameState == playState) {
@@ -379,13 +387,7 @@ public class GamePanel extends JPanel implements Runnable {
         g2.dispose();
     }
 
-    // Draws key count on screen
-    private void drawKeys(Graphics2D g2) {
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.setColor(Color.WHITE);
-        String text = "Keys: " + player.keys;
-        g2.drawString(text, 20, 60);
-    }
+
 
     // Resets game to initial state
     public void restartGame() {

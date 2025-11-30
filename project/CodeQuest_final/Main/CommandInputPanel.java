@@ -31,7 +31,7 @@ public class CommandInputPanel extends JPanel {
         JPanel topSection = new JPanel(new BorderLayout(5, 5));
         topSection.setBackground(new Color(45, 45, 48));
         
-        hintLabel = new JLabel("💡 Try: for i in range(5): move up");
+        hintLabel = new JLabel("try : player.moveright()");
         hintLabel.setForeground(new Color(106, 153, 85));
         hintLabel.setFont(new Font("Consolas", Font.ITALIC, 11));
         hintLabel.setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 10));
@@ -54,11 +54,9 @@ public class CommandInputPanel extends JPanel {
         commandField.addKeyListener(new KeyAdapter() {
             private int hintIndex = 0;
             private String[] hints = {
-                "💡 Try: for i in range(5): move up",
-                "💡 Try: if x < 200: move right",
-                "💡 Try: move up; move right; move down",
-                "💡 Try: walk 10 up",
-                "💡 Try: for i in range(3): walk 5 right"
+                " Try: player.moveright()",
+                " Try: for i in range(10) : player.moveup()",
+                " Try: if x > 200 : player.moveleft()",
             };
             
             @Override
@@ -84,9 +82,9 @@ public class CommandInputPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         buttonPanel.setBackground(new Color(45, 45, 48));
         
-        executeButton = createStyledButton("▶ Execute", new Color(0, 120, 215));
-        helpButton = createStyledButton("? Help", new Color(100, 100, 100));
-        clearButton = createStyledButton("⊗ Clear", new Color(160, 50, 50));
+        executeButton = createStyledButton(" Execute", new Color(0, 120, 215));
+        helpButton = createStyledButton(" Help", new Color(100, 100, 100));
+        clearButton = createStyledButton(" Clear", new Color(160, 50, 50));
         
         executeButton.addActionListener(e -> executeCommand());
         helpButton.addActionListener(e -> showHelp());
@@ -124,7 +122,7 @@ public class CommandInputPanel extends JPanel {
         
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        appendOutput("🐍 Python-Style CodeQuest Ready!");
+        appendOutput(" Python-Style CodeQuest Ready!");
         appendOutput("Type Python commands or click Help for examples.\n");
     }
     
@@ -176,24 +174,19 @@ public class CommandInputPanel extends JPanel {
 
     // Shows help information
     private void showHelp() {
-        commandParser.showHelp();
         appendOutput("\n--- HELP DISPLAYED IN CONSOLE ---\n");
         appendOutput("\n # MOVEMENT\n" +
-                "move up / down / left / right\n" +
-                "walk 10 right\n" +
+                "player.moveup() / player.movedown() / player.moveleft() / player.moveright()\n" +
                 "\n" +
                 "# PYTHON LOOPS\n" +
-                "for i in range(5): move up\n" +
+                "for i in range(5): player.moveup()\n" +
                 "\n" +
                 "# PYTHON CONDITIONS\n" +
-                "if x < 200: move right\n" +
+                "if x < 200: player.moveright()\n" +
                 "\n" +
                 "# DEBUGGING\n" +
-                "print \"checkpoint 1\"\n" +
-                "\n" +
-                "# CONTROL\n" +
-                "clear\n" +
-                "wait\n");
+                "print (\"massage\")\n" +
+                "clear\n");
     }
 
     // Clears command queue
@@ -232,8 +225,4 @@ public class CommandInputPanel extends JPanel {
         }
     }
 
-    // Focuses the command input field
-    public void focusCommandField() {
-        commandField.requestFocus();
-    }
 }

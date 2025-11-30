@@ -28,12 +28,6 @@ public class CommandParser {
                 return true;
             }
 
-            // Handle help command
-            if (command.equals("help")) {
-                showHelp();
-                return true;
-            }
-
             // Handle for loop
             if (command.startsWith("for ")) {
                 return parseForLoop(command);
@@ -181,60 +175,16 @@ public class CommandParser {
         cmd = cmd.trim();
 
         // Print command
-        if (cmd.startsWith("print ")) {
+        if (cmd.startsWith("print")) {
             String message = cmd.substring(6).trim();
-            message = message.replaceAll("^['\"]|['\"]$", ""); // Remove quotes
+            // Remove parentheses: print("hello") -> "hello"
+            if (message.startsWith("(") && message.endsWith(")")) {
+                message = message.substring(1, message.length() - 1).trim();
+            }
+            // Remove quotes: "hello" -> hello
+            message = message.replaceAll("^['\"]|['\"]$", "");
             adapter.executePrint(message);
             return true;
-        }
-
-        // Wait command
-        if (cmd.startsWith("wait")) {
-            if (cmd.equals("wait")) {
-                adapter.executeWait(500); // Default wait
-            } else {
-                try {
-                    String[] parts = cmd.split("\\s+");
-                    if (parts.length > 1) {
-                        int ms = Integer.parseInt(parts[1]); // Custom wait time
-                        adapter.executeWait(ms);
-                    }
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        // Turn command
-        if (cmd.startsWith("turn ")) {
-            String direction = cmd.substring(5).trim();
-            adapter.executeTurn(direction);
-            return true;
-        }
-
-        // Walk command (move multiple steps)
-        if (cmd.startsWith("walk ")) {
-            String[] parts = cmd.split("\\s+");
-            if (parts.length == 3) {
-                try {
-                    int steps = Integer.parseInt(parts[1]); // Number of steps
-                    String direction = parts[2]; // Direction
-                    for (int i = 0; i < steps; i++) {
-                        executeMovement(direction);
-                    }
-                    return true;
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        // Move command
-        if (cmd.startsWith("move ")) {
-            String direction = cmd.substring(5).trim();
-            return executeMovement(direction);
         }
 
         // Method-style commands
@@ -254,71 +204,6 @@ public class CommandParser {
             default:
                 return false;
         }
-    }
-
-    // Executes movement in specified direction
-    private boolean executeMovement(String direction) {
-        direction = direction.toLowerCase().replaceAll("['\"]", "");
-
-        switch (direction) {
-            case "up":
-            case "north":
-            case "w":
-                adapter.executeMoveUp();
-                return true;
-            case "down":
-            case "south":
-            case "s":
-                adapter.executeMoveDown();
-                return true;
-            case "left":
-            case "west":
-            case "a":
-                adapter.executeMoveLeft();
-                return true;
-            case "right":
-            case "east":
-            case "d":
-                adapter.executeMoveRight();
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    // Displays help information
-    public void showHelp() {
-        System.out.println("\n╔═══════════════ PYTHON COMMANDS ═══════════════╗");
-        System.out.println("│                                                 │");
-        System.out.println("│ MOVEMENT (Python style):                        │");
-        System.out.println("│   move up / down / left / right                 │");
-        System.out.println("│   walk 5 up                                     │");
-        System.out.println("│   turn left                                     │");
-        System.out.println("│                                                 │");
-        System.out.println("│ MOVEMENT (Method style):                        │");
-        System.out.println("│   player.moveup()                               │");
-        System.out.println("│   player.movedown()                             │");
-        System.out.println("│   player.moveleft()                             │");
-        System.out.println("│   player.moveright()                            │");
-        System.out.println("│                                                 │");
-        System.out.println("│ PYTHON FOR LOOPS:                               │");
-        System.out.println("│   for i in range(5): player.moveup()            │");
-        System.out.println("│   for i in range(3): move right                 │");
-        System.out.println("│                                                 │");
-        System.out.println("│ PYTHON IF STATEMENTS:                           │");
-        System.out.println("│   if x < 200: player.moveright()                │");
-        System.out.println("│   if y > 100: move up                           │");
-        System.out.println("│   if health > 2: move right                     │");
-        System.out.println("│                                                 │");
-        System.out.println("│ UTILITIES:                                      │");
-        System.out.println("│   print \"message\"                               │");
-        System.out.println("│   wait                                          │");
-        System.out.println("│   wait 1000                                     │");
-        System.out.println("│                                                 │");
-        System.out.println("│ CONTROL:                                        │");
-        System.out.println("│   clear / stop                                  │");
-        System.out.println("│                                                 │");
-        System.out.println("╚═════════════════════════════════════════════════╝\n");
     }
     
     // Returns number of queued commands

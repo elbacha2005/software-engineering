@@ -1,8 +1,7 @@
 package CodeQuest.Main;
 
 import CodeQuest.Entity.Player;
-import CodeQuest.Entity.NPC;
-import java.awt.Rectangle;
+
 import java.util.*;
 
 // Executes queued commands with smooth movement
@@ -64,58 +63,36 @@ public class CommandAdapter {
         int dx = targetX - player.worldX;
         int dy = targetY - player.worldY;
 
+        // Calculate distance
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Snap to target if close enough
         if (distance <= moveSpeed) {
+            // Close enough - snap to target
             player.worldX = targetX;
             player.worldY = targetY;
             isMoving = false;
+            // Keep direction for next command
         } else {
-            // Move towards target
+            // Move toward target
             double ratio = moveSpeed / distance;
             int stepX = (int)(dx * ratio);
             int stepY = (int)(dy * ratio);
 
-            int oldX = player.worldX;
-            int oldY = player.worldY;
-            player.worldX += stepX;
-            player.worldY += stepY;
+            // Predict future position by 5 pixels ahead of step
+            int predictX = player.worldX + stepX + (stepX > 0 ? 5 : stepX < 0 ? -5 : 0);
+            int predictY = player.worldY + stepY + (stepY > 0 ? 5 : stepY < 0 ? -5 : 0);
 
-            // Check collisions
-            player.collisionOn = false;
-            gamePanel.collisionChecker.checkTile(player);
-
-            // Check NPC collisions
-            Rectangle playerRect = new Rectangle(
-                player.worldX + player.solidArea.x,
-                player.worldY + player.solidArea.y,
-                player.solidArea.width,
-                player.solidArea.height
-            );
-
-            for (NPC npc : gamePanel.npcM.npcs) {
-                Rectangle npcRect = new Rectangle(
-                    npc.worldX + npc.solidArea.x,
-                    npc.worldY + npc.solidArea.y,
-                    npc.solidArea.width,
-                    npc.solidArea.height
-                );
-                if (playerRect.intersects(npcRect)) {
-                    player.collisionOn = true;
-                    break;
-                }
-            }
-
-            // Revert if collision detected
-            if (player.collisionOn) {
-                player.worldX = oldX;
-                player.worldY = oldY;
+            // Check if predicted position would collide
+            if (gamePanel.collisionChecker.checkAllCollisions(player, predictX, predictY)) {
                 isMoving = false;
                 return;
             }
 
-            // Update animation frame
+            // Move if clear
+            player.worldX += stepX;
+            player.worldY += stepY;
+
+            // Update sprite animation with timing
             long now = System.nanoTime();
             if (now - lastFrameTime > frameDelay) {
                 player.spriteNum++;
@@ -126,36 +103,26 @@ public class CommandAdapter {
             }
         }
     }
-
-    // Starts smooth movement to target position
+    // Clears action queue and stops movement
     private void startSmoothMove(int newTargetX, int newTargetY, String direction) {
         targetX = newTargetX;
         targetY = newTargetY;
         player.direction = direction;
         isMoving = true;
     }
-    
-    // Returns whether commands are executing
+
     public boolean isExecuting() {
         return isExecuting || !actionQueue.isEmpty() || isMoving;
     }
 
-    // Returns number of queued actions
     public int getQueueSize() {
         return actionQueue.size();
     }
 
-    // Sets delay between actions
     public void setActionDelay(int delayMs) {
         this.actionDelay = delayMs;
     }
 
-    // Sets movement speed
-    public void setMoveSpeed(int speed) {
-        this.moveSpeed = speed;
-    }
-
-    // Clears action queue and stops movement
     public void clearQueue() {
         actionQueue.clear();
         isExecuting = false;
@@ -164,100 +131,43 @@ public class CommandAdapter {
         targetY = player.worldY;
     }
 
-    // Queues move up action
+    // ========== Movement Execution Methods ==========
+
     public void executeMoveUp() {
         actionQueue.add(() -> {
-            int newY = player.worldY - 64; // One tile up
+            int newY = player.worldY - 64;
             player.direction = "up";
-            player.collisionOn = false;
-
-            // Check collision at target position
-            int oldY = player.worldY;
-            player.worldY = newY;
-            gamePanel.collisionChecker.checkTile(player);
-            player.worldY = oldY;
-
-            if (!player.collisionOn) {
-                startSmoothMove(player.worldX, newY, "up");
-            }
+            startSmoothMove(player.worldX, newY, "up");
         });
     }
 
-    // Queues move down action
     public void executeMoveDown() {
         actionQueue.add(() -> {
-            int newY = player.worldY + 64; // One tile down
+            int newY = player.worldY + 64;
             player.direction = "down";
-            player.collisionOn = false;
-
-            // Check collision at target position
-            int oldY = player.worldY;
-            player.worldY = newY;
-            gamePanel.collisionChecker.checkTile(player);
-            player.worldY = oldY;
-
-            if (!player.collisionOn) {
-                startSmoothMove(player.worldX, newY, "down");
-            }
+            startSmoothMove(player.worldX, newY, "down");
         });
     }
 
-    // Queues move left action
     public void executeMoveLeft() {
         actionQueue.add(() -> {
-            int newX = player.worldX - 64; // One tile left
+            int newX = player.worldX - 64;
             player.direction = "left";
-            player.collisionOn = false;
-
-            // Check collision at target position
-            int oldX = player.worldX;
-            player.worldX = newX;
-            gamePanel.collisionChecker.checkTile(player);
-            player.worldX = oldX;
-
-            if (!player.collisionOn) {
-                startSmoothMove(newX, player.worldY, "left");
-            }
+            startSmoothMove(newX, player.worldY, "left");
         });
     }
 
-    // Queues move right action
     public void executeMoveRight() {
         actionQueue.add(() -> {
-            int newX = player.worldX + 64; // One tile right
+            int newX = player.worldX + 64;
             player.direction = "right";
-            player.collisionOn = false;
-
-            // Check collision at target position
-            int oldX = player.worldX;
-            player.worldX = newX;
-            gamePanel.collisionChecker.checkTile(player);
-            player.worldX = oldX;
-
-            if (!player.collisionOn) {
-                startSmoothMove(newX, player.worldY, "right");
-            }
+            startSmoothMove(newX, player.worldY, "right");
         });
     }
 
-    // Queues turn action
-    public void executeTurn(String direction) {
-        actionQueue.add(() -> {
-            player.direction = direction; // Change direction without moving
-        });
-    }
-
-    // Queues wait action
-    public void executeWait(int milliseconds) {
-        actionQueue.add(() -> {
-            lastActionTime = System.currentTimeMillis() + milliseconds - actionDelay;
-        });
-    }
-
-    // Queues print action
     public void executePrint(String message) {
         actionQueue.add(() -> {
-            System.out.println(message); // Print to console
+            gamePanel.messageSystem.showPrintMessage(message);
         });
     }
 }

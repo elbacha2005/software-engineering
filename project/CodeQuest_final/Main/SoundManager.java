@@ -27,7 +27,7 @@ public class SoundManager {
     private void loadSounds() {
         try {
             // Prefer .ogg files (smaller size, better quality/size ratio)
-            menuMusic = getClass().getResource("/CodeQuest/res/audio/menu.ogg");
+            menuMusic = getClass().getResource("/CodeQuest/res/audio/menu.wav");
             if (menuMusic == null) {
                 menuMusic = getClass().getResource("/CodeQuest/res/audio/menu.wav");
                 System.out.println("Using menu.wav (fallback)");
@@ -35,7 +35,7 @@ public class SoundManager {
                 System.out.println("Loaded menu.ogg");
             }
 
-            townMusic = getClass().getResource("/CodeQuest/res/audio/town.ogg");
+            townMusic = getClass().getResource("/CodeQuest/res/audio/town.wav");
             if (townMusic == null) {
                 townMusic = getClass().getResource("/CodeQuest/res/audio/town.wav");
                 System.out.println("Using town.wav (fallback)");
